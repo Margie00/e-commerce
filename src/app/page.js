@@ -10,9 +10,20 @@ import Layout from "../../components/Layout";
 
 export default function Home(products) {
 
+  const [data, setData] = useState([]);
   const [phrase, setPhrase] = useState('');
 
   const categoryNames = [...new Set(productInfo.map(p => p.categoryNames))];
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch('../api/Products.js');
+      const json = await res.json();
+      setData(json);
+    }
+
+    fetchData();
+  }, []);
 
   if(phrase){
     products = productInfo.filter(p => p.name.toLowerCase().includes(phrase));
