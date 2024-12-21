@@ -1,7 +1,7 @@
 
 
-export default function Product(name, price, description, picture){
-    
+export default function Product(name, description, price, picture){
+
     return(
         <>
         <div className="w-64 ">

@@ -1,37 +1,55 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import Product from "../components/Product";
+import Product from "/components/Product.js";
+import { initMongoose } from "../../lib/mongoose";
+import { findAllProducts } from "../../pages/api/Products";
 
-export default function Home() {
+export default function Home(products) {
 
-  const [productInfo, setProductsInfo] = useState([])
-
-  useEffect(() => {
-    fetch('../api/Products.js')
-    .then(response => response.json())
-    .then(json => setProductsInfo(json));
-  }, []) 
+  const [phrase, setPhrase] = useState('');
 
   const categoryNames = [...new Set(productInfo.map(p => p.categoryNames))];
+
+  if(phrase){
+    products = productInfo.filter(p => p.name.toLowerCase().includes(phrase));
+  }
 
   // console.log({categoryNames})
 
   return (
-    <div className="p-5 bg-blue-100" id="mainDiv">
-      <div className="text-2xl font-bold catDiv">
+    <div className="p-5 bg-blue-100">
+      <input value={phrase} onChange={e => setPhrase(e.target.value)} type="text" placeholder="Search for products..." className="bg-gray-100 w-full py-2 px-4 rounded-xl"/>
+      <div className="text-2xl font-bold">
         {categoryNames.map(categoryNames => (
+
           <div key={categoryNames}>
-            <h2 className="text-2xl capitalize">{categoryNames}</h2>
+            {products.find(p => p.category === categoryNames) && (
+            <div>
+              <h2 className="text-2xl py-5 capitalize">{categoryNames}</h2>
+          <div className="flex -mx-5 overflo-x-scroll snap-x scrollbar-hide"></div>
+
             {productInfo.filter(p => p.category === categoryNames).map(productInfo => (
-              <Product{...productInfo}/>
+              <div key={productInfo.id} className="px-5 snap-start">
+                <Product {...productInfo}/> 
+              </div>
             ))}
+              </div>
+            )}
+            
           </div>
         ))}
-        <div className="py-4 productDiv">
-        
-        </div>
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  await initMongoose()
+  const products = await findAllProducts();
+  return {
+    props: {
+      products: JSON.parse(JSON.stringify(products)),
+    },
+  };
 }
