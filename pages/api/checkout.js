@@ -1,20 +1,24 @@
+import { metadata } from "@/app/layout";
 import { initMongoose } from "../../lib/mongoose";
+import Order from "../../models/Orders";
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res){
     await initMongoose();
 
     if(req.method !== "POST"){
-        res.body("should post but its not!").send();
+        res.json("should post but its not!").send();
         return;
     }
 
+    const {email, name, address, city } = req.body;
     const productsIds = req.body.products.split(',');
     const uniqIds = [...new Set(productsIds)]
     const products = await Product.find({_id: {$in:uniqIds}}).exec();
+    // return res.json({productsIds});
 
     for (let productId of uniqIds){
-        const quantity = productsIds.find(id => productId).length;
+        const quantity = productsIds.filter(id => id === productId).length;
         const product = products.find(p => p._id.toStrng() === productId);
         line_items.push({
             quantity,
@@ -26,12 +30,27 @@ export default async function handler(req, res){
         });
     }
 
+    // return res.json({line_items});
+
+    const order = await Order.create({
+        products: line_items,
+        name, 
+        email, 
+        address, 
+        city,
+        paid: 0,
+      });
+
     const session = await stripe.checkout.sessions.create({
         line_items: line_items,
         mode: 'payment',
+        customer_email: email,
         success_url: `${req.headers.origin}/?success=true`,
         cancel_url: `${req.headers.origin}/?canceled=true`,
+        metadata: {orderId:order._id.toString()},
       });
+
+      
 
       res.redirect(303, session.url);
 
