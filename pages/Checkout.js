@@ -41,7 +41,6 @@ export default function CheckoutPage(){
 
     const total = subTotal + deliveryPrice;
 
-
     return(
         <Layout>
            {!productsInfos.length && (
