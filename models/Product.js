@@ -1,8 +1,6 @@
 import {model, Schema} from "mongoose";
 
 
-const { Schema } = require("mongoose");
-
 const ProductSchemma = new Schema({
     name: String,
     description: String,

@@ -8,7 +8,10 @@ import Footer from "../../components/Footer";
 import Layout from "../../components/Layout";
 
 
-export default function Home(products) {
+export default async function Home(products) {
+
+  await initMongoose();
+  products = await findAllProducts();
 
   const [data, setData] = useState([]);
   const [phrase, setPhrase] = useState('');
@@ -60,12 +63,3 @@ export default function Home(products) {
   );
 }
 
-export async function getServerSideProps() {
-  await initMongoose()
-  const products = await findAllProducts();
-  return {
-    props: {
-      products: JSON.parse(JSON.stringify(products)),
-    },
-  };
-}

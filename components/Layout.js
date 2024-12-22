@@ -6,6 +6,7 @@ export default function Layout(){
             <div className="p-5" >
                 {Children}
              </div>
+             
             <Footer />
         </div>
         
