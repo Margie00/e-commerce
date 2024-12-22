@@ -9,9 +9,15 @@ Next.js: A modern React framework for fast, server-rendered, and optimized web d
 
 Mongoose: MongoDB ODM (Object Data Modeling) library for interacting with the database.
 
+MongoDB: Database for storing product and user data.
+
 TailwindCSS: Utility-first CSS framework for styling.
 
 Node.js: Backend runtime for running the API.
+
+Stripe: Payment processing platform
+
+
 
 ## Getting Started
 
