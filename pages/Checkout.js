@@ -34,7 +34,7 @@ export default function CheckoutPage(){
     let subTotal = 0;
     if(selectedProducts?.length){
         for(let id of selectedProducts){
-            const price = productsInfos.find(p => p._id === id).price;
+            const price = productsInfos.find(p => p._id === id).price || 0;
             total += price;
         }
     }
@@ -44,9 +44,13 @@ export default function CheckoutPage(){
 
     return(
         <Layout>
-           {!productsInfos.length && (<div>no products in your cart</div>
+           {!productsInfos.length && (
+            <div>cart is empty</div>
         )}
-        {productsInfos.length && productsInfos.map(productInfo => (
+        {productsInfos.length && productsInfos.map(productInfo => {
+            const amount = selectedProducts.filter(id => id === productInfo._id).length
+            if(amount === 0)return;
+            return(
             <div className="flex mb-5" key={productInfo.id}>
                 <div className="bg-gray-100 p-3 rounded-xl shrink-0">
                     <img className="w-24" src={productInfo.picture} />
@@ -66,12 +70,13 @@ export default function CheckoutPage(){
                     </div>
                 </div>
             </div>
-        ))}
+        )})}
+        <form action="/api/checkout" method="POST">
         <div className="mt-4">
-            <input value={name} onChange={e => setName(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="email" placeholder="Your name"></input>
-            <input value={email} onChange={e => setEmail(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="email" placeholder="Email address"></input>
-            <input value={address} onChange={e => setAddress(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="Street address, number"></input>
-            <input value={city} onChange={e => setCity(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="City and postal code"></input>
+            <input value="name" onChange={e => setName(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="email" placeholder="Your name"></input>
+            <input value="email" onChange={e => setEmail(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="email" placeholder="Email address"></input>
+            <input value="address" onChange={e => setAddress(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="Street address, number"></input>
+            <input value="city" onChange={e => setCity(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="City and postal code"></input>
             
         </div>
         <div className="mt-4">
@@ -88,7 +93,11 @@ export default function CheckoutPage(){
             <h3 className="font-bold">${total}</h3>
         </div>
         </div>
+        
+        <input type="hidden" name="product" value={selectedProducts.join(',')}/>
         <button className="bg-blue-500 px-5 py-2 rounded-el font-bold text-white w-full my-4 shadow-blue-300 shadow-lg">Continue to checkout</button>
+        </form>
+        
         </Layout>
     )
 }
